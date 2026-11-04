@@ -28,7 +28,6 @@ class _PostListScreenState extends State<PostListScreen> {
     });
 
     try {
-      // // Latihan 3b: Memanggil method getPosts() dari ApiService
       final posts = await _apiService.getPosts();
       setState(() {
         _posts = posts;
@@ -110,7 +109,6 @@ class _PostListScreenState extends State<PostListScreen> {
       return const Center(child: Text('Tidak ada post tersedia'));
     }
 
-    // // Latihan 3c: Gunakan ListView.builder untuk menampilkan posts
     return RefreshIndicator(
       onRefresh: _loadPosts,
       child: ListView.builder(
