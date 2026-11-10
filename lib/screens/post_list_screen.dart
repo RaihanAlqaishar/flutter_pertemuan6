@@ -1,16 +1,22 @@
+// ==========================================
+// LATIHAN 1d: PostListScreen menggunakan PostRepository
+// ==========================================
 import 'package:flutter/material.dart';
 import '../models/post.dart';
-import '../services/api_service.dart';
+import '../repositories/post_repository.dart';
+import '../repositories/post_repository_impl.dart';
 
 class PostListScreen extends StatefulWidget {
-  const PostListScreen({super.key});
+  final PostRepository? repository;
+
+  const PostListScreen({super.key, this.repository});
 
   @override
   State<PostListScreen> createState() => _PostListScreenState();
 }
 
 class _PostListScreenState extends State<PostListScreen> {
-  final ApiService _apiService = ApiService();
+  late final PostRepository _repository;
   List<Post> _posts = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -18,6 +24,7 @@ class _PostListScreenState extends State<PostListScreen> {
   @override
   void initState() {
     super.initState();
+    _repository = widget.repository ?? PostRepositoryImpl();
     _loadPosts();
   }
 
@@ -28,7 +35,7 @@ class _PostListScreenState extends State<PostListScreen> {
     });
 
     try {
-      final posts = await _apiService.getPosts();
+      final posts = await _repository.getPosts();
       setState(() {
         _posts = posts;
         _isLoading = false;
@@ -46,7 +53,7 @@ class _PostListScreenState extends State<PostListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Posts'),
-        backgroundColor: Colors.deepPurple,
+        backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -137,7 +144,7 @@ class _PostListScreenState extends State<PostListScreen> {
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
+                      color: Colors.teal,
                     ),
                   ),
                   const SizedBox(height: 8),

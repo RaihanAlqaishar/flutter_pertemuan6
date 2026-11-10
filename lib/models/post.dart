@@ -1,3 +1,6 @@
+// ==========================================
+// LATIHAN 1: Model Post
+// ==========================================
 class Post {
   final int userId;
   final int id;

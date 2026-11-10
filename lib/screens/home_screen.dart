@@ -74,9 +74,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // // Latihan 2: Menambahkan Fitur Logout
   Future<void> _logout() async {
-    // // Latihan 2b: Gunakan showDialog untuk konfirmasi sebelum logout
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
@@ -102,7 +100,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (confirm == true) {
-      // // Latihan 2a: Hapus token dari secure storage menggunakan SecureStorageService.deleteToken()
       await _storageService.deleteToken();
 
       if (mounted) {
@@ -113,7 +110,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         );
 
-        // // Latihan 2c: Gunakan Navigator untuk kembali ke halaman login
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const LoginScreen()),
@@ -242,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
               const SizedBox(height: 16),
 
-              // Section 2: HTTP Request
+              // Section 2: HTTP Request & List Screens
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -284,7 +280,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                       const SizedBox(height: 12),
-                      // // Navigasi untuk Latihan 3 (PostListScreen)
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton.icon(
@@ -307,21 +302,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ],
                   ),
-                ),
-              ),
-
-              const SizedBox(height: 16),
-
-              OutlinedButton.icon(
-                onPressed: _logout,
-                icon: const Icon(Icons.logout, color: Colors.red),
-                label: const Text(
-                  'Logout dari Aplikasi',
-                  style: TextStyle(color: Colors.red),
-                ),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
                 ),
               ),
             ],

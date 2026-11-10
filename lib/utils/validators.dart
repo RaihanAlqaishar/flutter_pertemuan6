@@ -1,62 +1,36 @@
-/// Kumpulan fungsi validasi dan sanitasi input.
-///
-/// Class ini menyediakan method statis untuk memvalidasi input
-/// pengguna dan membersihkan karakter berbahaya.
+// ==========================================
+// LATIHAN 3: Validators (Phone, URL, Password, Email)
+// ==========================================
 class Validators {
-/// Memvalidasi format email.
-///
-/// Mengembalikan `true` jika [email] memiliki format yang valid.
-static bool isValidEmail(String email) {
-final regex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
-return regex.hasMatch(email);
-}
-/// Memvalidasi bahwa [value] tidak kosong.
-static bool isNotEmpty(String? value) {
+  static bool isValidEmail(String email) {
+    final emailRegExp = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    return emailRegExp.hasMatch(email);
+  }
 
-return value != null && value.trim().isNotEmpty;
-}
-/// Memvalidasi panjang [value] antara [min] dan [max].
-static bool hasValidLength(String value, {int min = 1, int max = 100}) {
-final length = value.trim().length;
-return length >= min && length <= max;
-}
-/// Membersihkan input dari karakter berbahaya.
-///
-/// Mengganti karakter `<`, `>`, `"`, dan `'` dengan HTML entities
-/// untuk mencegah XSS.
-static String sanitize(String input) {
-return input
-.replaceAll('<', '<')
-.replaceAll('>', '>')
-.replaceAll('"', '"')
-.replaceAll("'", "'")
-.trim();
-}
-/// Memvalidasi dan membersihkan input teks.
-///
-/// Mengembalikan pesan error jika tidak valid, atau `null` jika valid.
-static String? validateText(
-String? value, {
-String fieldName = 'Field',
-int minLength = 1,
-int maxLength = 100,
-}) {
-if (value == null || value.trim().isEmpty) {
-return '$fieldName tidak boleh kosong';
-}
-if (!hasValidLength(value, min: minLength, max: maxLength)) {
-return '$fieldName harus antara $minLength-$maxLength karakter';
-}
-return null;
-}
-/// Memvalidasi dan membersihkan email.
-static String? validateEmail(String? value) {
-if (value == null || value.trim().isEmpty) {
-return 'Email tidak boleh kosong';
-}
-if (!isValidEmail(value.trim())) {
-return 'Format email tidak valid';
-}
-return null;
-}
+  static bool validatePhone(String phone) {
+    final phoneRegExp = RegExp(r'^[0-9]{10,13}$');
+    return phoneRegExp.hasMatch(phone);
+  }
+
+  static bool validateUrl(String url) {
+    final urlRegExp = RegExp(r'^https?:\/\/[\w\-]+(\.[\w\-]+)+[/#?]?.*$');
+    return urlRegExp.hasMatch(url);
+  }
+
+  static bool validatePassword(String password) {
+    if (password.length < 8) return false;
+    final hasUppercase = password.contains(RegExp(r'[A-Z]'));
+    final hasDigits = password.contains(RegExp(r'[0-9]'));
+    final hasSpecialCharacters = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
+    
+    return hasUppercase && hasDigits && hasSpecialCharacters;
+  }
+
+  static String sanitize(String input) {
+    return input.replaceAll(RegExp(r'<[^>]*>'), '');
+  }
+
+  static bool validateText(String text, {int minLength = 1, int maxLength = 255}) {
+    return text.length >= minLength && text.length <= maxLength;
+  }
 }

@@ -6,10 +6,6 @@ import '../config/app_config.dart';
 import '../models/post.dart';
 import '../models/user.dart';
 
-/// Service untuk komunikasi HTTP dengan REST API.
-///
-/// Class ini menangani semua request HTTP ke API, termasuk
-/// penanganan error dan timeout.
 class ApiService {
   final http.Client _client;
   final String _baseUrl;
@@ -18,10 +14,8 @@ class ApiService {
       : _client = client ?? http.Client(),
         _baseUrl = baseUrl ?? AppConfig.baseUrl;
 
-  /// Method untuk Login (Simulasi/Request API)
   Future<String> login(String email, String password) async {
     await Future.delayed(const Duration(seconds: 1));
-
     if (email.isNotEmpty && password.isNotEmpty) {
       return 'dummy_token_secure_123456789';
     } else {
@@ -29,7 +23,9 @@ class ApiService {
     }
   }
 
-  /// Mengambil daftar post dari API (Mengembalikan List<Post>)
+  /// ==========================================
+  /// LATIHAN 1c: Method getPosts() di ApiService
+  /// ==========================================
   Future<List<Post>> getPosts() async {
     try {
       _logRequest('GET', '/posts');
@@ -46,9 +42,7 @@ class ApiService {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => Post.fromJson(json)).toList();
       } else {
-        throw Exception(
-          'Gagal memuat post. Status: ${response.statusCode}',
-        );
+        throw Exception('Gagal memuat post. Status: ${response.statusCode}');
       }
     } on TimeoutException {
       throw Exception('Request timeout. Periksa koneksi internet Anda.');
@@ -61,7 +55,6 @@ class ApiService {
     }
   }
 
-  /// Mengambil daftar pengguna dari API.
   Future<List<User>> getUsers() async {
     try {
       _logRequest('GET', '/users');
@@ -78,22 +71,17 @@ class ApiService {
         final List<dynamic> data = jsonDecode(response.body);
         return data.map((json) => User.fromJson(json)).toList();
       } else {
-        throw Exception(
-          'Gagal memuat data. Status: ${response.statusCode}',
-        );
+        throw Exception('Gagal memuat data. Status: ${response.statusCode}');
       }
     } on TimeoutException {
-      throw Exception('Request timeout. Periksa koneksi internet Anda.');
+      throw Exception('Request timeout.');
     } on SocketException {
-      throw Exception('Tidak ada koneksi internet. Periksa jaringan Anda.');
-    } on FormatException {
-      throw Exception('Format data tidak valid.');
+      throw Exception('Tidak ada koneksi internet.');
     } catch (e) {
       throw Exception('Terjadi kesalahan: $e');
     }
   }
 
-  /// Mengambil pengguna berdasarkan [id].
   Future<User> getUserById(int id) async {
     try {
       _logRequest('GET', '/users/$id');
@@ -110,20 +98,13 @@ class ApiService {
         final Map<String, dynamic> data = jsonDecode(response.body);
         return User.fromJson(data);
       } else {
-        throw Exception(
-          'Gagal memuat data. Status: ${response.statusCode}',
-        );
+        throw Exception('Gagal memuat data. Status: ${response.statusCode}');
       }
-    } on TimeoutException {
-      throw Exception('Request timeout. Periksa koneksi internet Anda.');
-    } on SocketException {
-      throw Exception('Tidak ada koneksi internet. Periksa jaringan Anda.');
     } catch (e) {
       throw Exception('Terjadi kesalahan: $e');
     }
   }
 
-  /// Membangun header untuk request HTTP.
   Map<String, String> _buildHeaders() {
     return {
       'Content-Type': 'application/json',
@@ -131,17 +112,14 @@ class ApiService {
     };
   }
 
-  /// Logging request yang aman.
   void _logRequest(String method, String endpoint) {
     print('[$method] $endpoint');
   }
 
-  /// Logging response yang aman.
   void _logResponse(int statusCode) {
     print('Response status: $statusCode');
   }
 
-  /// Menutup client.
   void dispose() {
     _client.close();
   }

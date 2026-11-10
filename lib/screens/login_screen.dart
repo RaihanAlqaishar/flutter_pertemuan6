@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import '../services/secure_storage_service.dart';
+import '../utils/validators.dart';
 import 'home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,14 +30,19 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    // Validasi Gagal: Jika email atau password kosong
+    // Validasi ketat sebelum masuk ke API/token
     if (email.isEmpty || password.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Login Gagal: Email dan password tidak boleh kosong!'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      _showError('Email dan password tidak boleh kosong!');
+      return;
+    }
+
+    if (!Validators.isValidEmail(email)) {
+      _showError('Format email tidak valid (contoh: user@domain.com)');
+      return;
+    }
+
+    if (!Validators.validatePassword(password)) {
+      _showError('Password min 8 karakter, ada huruf besar (A-Z), angka, & simbol!');
       return;
     }
 
@@ -45,14 +51,10 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      // Simulasi login menggunakan ApiService.login()
       final token = await _apiService.login(email, password);
-
-      // Simpan token ke secure storage
       await _storageService.saveToken(token);
 
       if (mounted) {
-        // Pesan Sukses
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login Berhasil! Token tersimpan.'),
@@ -60,7 +62,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         );
 
-        // Pindah ke HomeScreen
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => const HomeScreen()),
@@ -68,13 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (mounted) {
-        // Pesan Gagal jika terjadi error pada API/simulasi
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Login Gagal: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showError('Login Gagal: $e');
       }
     } finally {
       if (mounted) {
@@ -85,11 +80,20 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Login - Secure Storage'),
+        title: const Text('Login - Secure & Validation'),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
       ),
@@ -115,41 +119,29 @@ class _LoginScreenState extends State<LoginScreen> {
                   color: Colors.deepPurple,
                 ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'Silakan login untuk masuk ke aplikasi',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
-              ),
               const SizedBox(height: 32),
-              
-              // Input Email
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: const InputDecoration(
                   labelText: 'Email',
-                  hintText: 'Masukkan email Anda',
+                  hintText: 'contoh@domain.com',
                   prefixIcon: Icon(Icons.email),
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 16),
-
-              // Input Password
               TextField(
                 controller: _passwordController,
                 obscureText: true,
                 decoration: const InputDecoration(
                   labelText: 'Password',
-                  hintText: 'Masukkan password Anda',
+                  hintText: 'Min 8 char (A-Z, 0-9, Simbol)',
                   prefixIcon: Icon(Icons.lock),
                   border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 24),
-
-              // Tombol Login
               ElevatedButton.icon(
                 onPressed: _isLoadingLogin ? null : _login,
                 icon: _isLoadingLogin
